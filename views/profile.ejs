@@ -2,9 +2,87 @@
 <!doctype html>
 <html>
 <head>
-    <title>Node Authentication</title>
+    <title>Metwork</title>
+
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+
+
+<script>
+
+
+function initialize() {
+    var map;
+    var service;
+    var geocoder = new google.maps.Geocoder();
+    var area = "<%= user.linkedin.location %>";
+    var company = ["<%= user.linkedin.company %>"];
+    var industry = "<%= user.linkedin.industry %>";
+    var profile = "<%= user.linkedin.picture %>";
+    var name = "<%= user.linkedin.name %>";
+    geocoder.geocode({'address': area}, function(results, status) {
+      var latlng = results[0].geometry.location;
+      var newMap = new google.maps.LatLng(latlng.k, latlng.D);
+      map = new google.maps.Map(document.getElementById('googleMap'), {
+          center: newMap,
+          zoom: 15
+        });
+      var request = {
+        location: newMap,
+        radius: '500',
+        query: company
+      };
+
+      service = new google.maps.places.PlacesService(map);
+      service.textSearch(request, callback);
+
+      function callback(results, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+            var place = results[0].formatted_address;
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({'address': place}, function(results, status) {
+              var latlng = results[0].geometry.location;
+              var newMap = new google.maps.LatLng(latlng.k, latlng.D);
+              map = new google.maps.Map(document.getElementById('googleMap'), {
+                  center: newMap,
+                  zoom: 15
+                });
+              marker = new google.maps.Marker({
+                position: newMap,
+                map: map,
+                title: place
+            });
+              var infoWindow = new google.maps.InfoWindow()
+
+              var infoWindowContent = 
+                  '<div class="info_content">' +
+                  '<h3> <%= user.linkedin.name %> </h3>' +
+                  '<p><%= user.linkedin.industry %></p>' +
+                  '<img src="<%= user.linkedin.picture %>">' + '</div>';
+
+              google.maps.event.addListener(marker, 'click', (function(marker) {
+                return function() {
+                    infoWindow.setContent(infoWindowContent);
+                    infoWindow.open(map, marker);
+                }
+              })(marker));
+
+
+          });
+          }
+        }
+      
+    });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+
+
     <style>
         body        { padding-top:80px; word-wrap:break-word; }
     </style>
@@ -13,31 +91,19 @@
 <div class="container">
 
     <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+        <h1>Connections Around You</h1>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
     </div>
 
-    <div class="row">
 
-        <!-- FACEBOOK INFORMATION -->
-        <div class="col-sm-6">
-            <div class="well">
-                <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
-
-                    <p>
-                        <strong>id</strong>: <%= user.facebook.id %><br>
-
-                        <strong>email</strong>: <%= user.facebook.email %><br>
-                        <strong>name</strong>: <%= user.facebook.name %>
-                        <strong>friends</strong>: <%= user.facebook.friends %>
-                        <strong>location</strong>: <%= user.facebook.address %>
-                    </p>
-
-            </div>
-        </div>
-
-    </div>
-
+            <div style="width: 1000px; height: 500px;" id="googleMap"></div>
+            <div id="cl"> <%= user.linkedin.company %> <%= user.linkedin.location %> </div>
+                        <strong>email</strong>: <%= user.linkedin.email %><br>
+                        <strong>industry</strong>: <%= user.linkedin.industry %><br>
+                        <strong>location</strong>: <%= user.linkedin.location %><br>
+                        <strong>picture</strong>: <%= user.linkedin.picture %><br>
+                        <strong>name</strong>: <%= user.linkedin.name %><br>
+                        <strong>company</strong>: <%= user.linkedin.company %>
 </div>
 </body>
 </html>

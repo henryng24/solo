@@ -20,7 +20,9 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser());
 
+app.use(express.static(__dirname+'/views'));
 app.set('view engine', 'ejs'); 
+
 
 app.use(session({ secret: 'secret' })); 
 app.use(passport.initialize());

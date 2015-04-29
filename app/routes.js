@@ -40,23 +40,14 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
-    app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
+    app.get('/auth/linkedin', passport.authenticate('linkedin', { scope : ['r_basicprofile','r_emailaddress', 'r_contactinfo', 'r_network', 'r_fullprofile'], state: true }));
 
     // handle the callback after facebook has authenticated the user
-    app.get('/auth/facebook/callback',
-        passport.authenticate('facebook', {
+    app.get('/auth/linkedin/callback',
+        passport.authenticate('linkedin', {
             successRedirect : '/profile',
             failureRedirect : '/'
         }));
-
-    // app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-
-    // // the callback after google has authenticated the user
-    // app.get('/auth/google/callback',
-    //         passport.authenticate('google', {
-    //                 successRedirect : '/profile',
-    //                 failureRedirect : '/'
-    //         }));
 
 
 
